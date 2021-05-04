@@ -1,0 +1,63 @@
+specVersion: 0.0.2
+description: Zoracles Governance Subgraph
+repository: https://github.com/warlord-dev/yfd-governance-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: GovernorAlpha
+    network: mainnet
+    source:
+      address: '0x2018f98B50C707AECfbd2F22622869Bc02A3f869'
+      abi: GovernorAlpha
+      startBlock: 12368863
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - Delegate
+        - TokenHolder
+        - Proposal
+        - Vote
+        - Governance
+      abis:
+        - name: GovernorAlpha
+          file: ./abis/GovernorAlpha.json
+      eventHandlers:
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleProposalQueued
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: VoteCast(address,uint256,bool,uint256)
+          handler: handleVoteCast
+  - kind: ethereum/contract
+    name: VOTX
+    network: mainnet
+    source:
+      address: '0x3bebdce1219c394dfaa1df781f9aa31d179dff47'
+      abi: VOTX
+      startBlock: 12368830
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - Delegate
+        - TokenHolder
+      abis:
+        - name: VOTX
+          file: ./abis/VOTX.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
